@@ -1,6 +1,6 @@
 # sund
 
-> A code project for Stacc
+> A code project
 
 ## Build Setup
 
