@@ -6,12 +6,11 @@
 
 <script>
 import HelloWorld from './components/HelloWorld'
-import Results from './components/results'
 
 export default {
   name: 'App',
   components: {
-    Results, HelloWorld
+   HelloWorld
   }
 }
 </script>
