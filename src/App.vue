@@ -5,12 +5,12 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld'
+import MainPage from './components/MainPage'
 
 export default {
   name: 'App',
   components: {
-   HelloWorld
+   MainPage
   }
 }
 </script>

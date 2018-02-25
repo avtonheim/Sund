@@ -1,28 +1,27 @@
 <template>
 <div class="hello">
     <section id="searchContainer">
-      <h1>Søk i Brønnøysundregisterene</h1>
-      <div>
-        <input type="number" class="searchBar" id="searchNum" min="9" v-model="inputNum" placeholder="Organisasjonsnummer" />
-        <button v-on:click="sendDataNum()">Søk etter org nr</button>
-      </div>
-      <div>
-        <input type="text" class="searchBar" id="searchName" v-model="inputName" placeholder="Bedriftsnavn" />
-        <button v-on:click="sendDataName()">Søk etter bedriftsnavn</button>
-      </div>
+      <img src="../assets/brreg_logo.svg" alt="logo brreg">
+      <h1>Søk i enhetsregisteret</h1>
+      <p>Søket startar med tredje teikn i søkefeltet med namn, eller med gyldig organisasjonsnummer.</p>
+      <form>
+        <input type="text" class="searchBar" v-model="input" placeholder="Start eit søk..." />
+        <button v-on:click="sendData()">Søk</button>
+      </form>
     </section>
     <section id="contentContainer">
           <template v-for="svar in filteredItems">
             <section v-if="svar" class="listItems">
                 <p v-if="svar.orgform.beskrivelse" class="itemIndex">{{ svar.orgform.beskrivelse }}</p>
                 <h1>{{ svar.navn }}</h1>
+                <div v-if="svar.konkurs == 'J'"><p class="konkurs">BEDRIFTA ER KONKURS</p></div>
                 <p>OrgNr: {{svar.organisasjonsnummer}}</p>
-                <div v-if="svar.forretningsadresse.kommune">{{ svar.forretningsadresse.poststed }}</div>
-                <div v-if="svar.konkurs == 'J'" class="konkurs">BEDRIFTA ER KONKURS</div>
+                <div v-if="svar.forretningsadresse.kommune">Poststed: {{ svar.forretningsadresse.poststed }}</div>
                 <div v-if="svar.hjemmeside">{{ svar.hjemmeside }}</div>
                 <div v-if="svar.epost">E-post: {{ svar.epost }}</div>
-              </section>
-          </template>
+          </section>
+        </template>
+
     </section>
     <section>
 
@@ -31,20 +30,19 @@
 </template>
 
 <script>
-import axios from "axios"
-var apiUrl = "http://data.brreg.no/enhetsregisteret/enhet/";
+import axios from 'axios'
 
 export default {
-  name: 'HelloWorld',
+  name: 'MainPage',
   data () {
            return {
                items: [],
-               inputNum: '',
-               inputName: ''
+               input: ''
              }
            },
 
        mounted () {
+    /*Første som skjer då sida lastar inn innhaldet inn i ein arraylist kalla items*/
          axios({ method: 'GET', 'url': 'http://data.brreg.no/enhetsregisteret/enhet.json'}).then(result => {
             this.items = result.data.data
          }, error => {
@@ -53,32 +51,30 @@ export default {
          });
       },
       computed: {
+    /*Søket skal starte på det tredje teiknet, og dersom ein søker på eit org nummer skal dette visast fram*/
         filteredItems: function() {
         var that = this
         return this.items.filter(function(svar) {
-          return svar.navn.toLowerCase().search(that.inputName.toLowerCase()) !== -1
-           //svar.organisasjonsnummer.toString().indexOf(that.inputNum) !== -1
+          if (that.input.length > 2) {
+            var result = svar.navn.toLowerCase().search(that.input.toLowerCase()) !== -1
+        } if (isNaN(that.input) === false && that.input.length === 9){
+            var result = svar.organisasjonsnummer.toString().indexOf(that.input) !== -1
+         } return result
         })
       }
     },
       methods: {
-        sendDataNum () {
-               axios({ method: 'GET', 'url': 'http://data.brreg.no/enhetsregisteret/enhet/' + this.inputNum }).then(result => {
-                  this.items = result.data.data
-                  console.log(result.data.data)
+      /*Kaller på api-et når ein skal søke etter namn og org nr*/
+      /*Den fungerer ikkje som eg vil!*/
+        sendData () {
+               axios({ method: 'GET', 'url': 'http://data.brreg.no/enhetsregisteret/enhet/' + this.input + '.json'}).then(result => {
+                 this.items = result.data
+                 console.log(result.data)
                }, error => {
                    console.error(error)
-                   this.items = 'Det skjedde ein feil...' + error
+                   that.items = 'Det skjedde ein feil...' + error
                });
-           },
-        sendDataName () {
-                axios({ method: 'GET', 'url': 'http://data.brreg.no/enhetsregisteret/enhet/', 'data.data': this.inputName, 'headers': { 'content-type': 'application/vnd.er-api-v1.0+json' } }).then(result => {
-                  this.items = result.data.data
-                   }, error => {
-                       console.error(error)
-                       this.items = 'Det skjedde ein feil...' + error
-                   });
-               }
+           }
        }
    }
 </script>
@@ -92,22 +88,22 @@ export default {
       color: #42b983;
   }
   .searchBar{
-    width: 200px;
-    height: 30px;
-    font-size: 16px;
+    width: 300px;
+    height: 60px;
+    font-size: 26px;
   }
   #searchContainer{
     color: black;
     margin: 10px;
     padding: 20px;
+    background-color: #ADEFFF;
+    border-bottom: solid 20px #6CE3FF;
   }
   #searchContainer button{
-    height: 35px;
+    height: 65px;
     width: 150px;
     background-color: white;
-  }
-  #searchContainer div{
-    display: block;
+    font-size: 26px;
   }
   #contentContainer{
     width: 100%;
@@ -126,12 +122,15 @@ export default {
     line-height: 1.5em;
   }
   .konkurs{
-    color: #F55D5D;
+    color: #D64E4E;
     font-weight: strong;
   }
   .itemIndex{
     color: white;
     font-size: 14px;
-    font-style: strong;
+    font-weight: strong;
+  }
+  img {
+    width: 40%
   }
 </style>
