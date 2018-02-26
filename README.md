@@ -3,9 +3,9 @@
 This is a web app using vue.js to build a simple search engine to search data from Brønnøysundregisteret.
 
 Implemented functionalities:
-- Possibility to search for a organisation number (nine digits).
-- Possibility to search for an entity by name (minimum three characters), incrementally.
-- Entities that are bankrupt are shown.
+Possibility to search for a organisation number (nine digits).
+Possibility to search for an entity by name (minimum three characters), incrementally.
+Entities that are bankrupt are highlighted.
 
 > A code project
 
